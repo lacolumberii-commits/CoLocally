@@ -1,0 +1,56 @@
+// This schema defines the models for a CoLocally application using Prisma
+
+// The main models include Business, Product, Availability, Review, Order, and OrderItem
+
+model Business {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  location  String
+  products  Product[]
+  reviews    Review[]
+}
+
+model Product {
+  id           Int        @id @default(autoincrement())
+  name         String
+  description  String
+  price        Float
+  availability  Availability?
+  reviews      Review[]
+  orders       OrderItem[]
+  business     Business?   @relation(fields: [businessId], references: [id])
+  businessId   Int?
+}
+
+model Availability {
+  id          Int        @id @default(autoincrement())
+  product     Product?
+  productId   Int?
+  startDate   DateTime
+  endDate     DateTime
+}
+
+model Review {
+  id        Int       @id @default(autoincrement())
+  rating    Int       @default(0)
+  comment   String?
+  product   Product?
+  productId Int?
+  business   Business?
+  businessId Int?
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  total       Float
+  orderItems  OrderItem[]
+}
+
+model OrderItem {
+  id          Int       @id @default(autoincrement())
+  quantity     Int     @default(1)
+  product      Product
+  productId    Int
+  order        Order?
+  orderId      Int?
+}
