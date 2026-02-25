@@ -1,56 +1,54 @@
-// This schema defines the models for a CoLocally application using Prisma
+// Prisma schema defining Business, Product, Availability, Review, Order, and OrderItem models
 
-// The main models include Business, Product, Availability, Review, Order, and OrderItem
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
 
 model Business {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  location  String
+  id        Int      @id @default(autoincrement())
+  name      String
   products  Product[]
-  reviews    Review[]
 }
 
 model Product {
-  id           Int        @id @default(autoincrement())
-  name         String
-  description  String
-  price        Float
-  availability  Availability?
-  reviews      Review[]
-  orders       OrderItem[]
-  business     Business?   @relation(fields: [businessId], references: [id])
-  businessId   Int?
+  id            Int          @id @default(autoincrement())
+  name          String
+  price         Float
+  availabilityId Int
+  availability   Availability @relation(fields: [availabilityId], references: [id])
+  orders        OrderItem[]
 }
 
 model Availability {
-  id          Int        @id @default(autoincrement())
-  product     Product?
-  productId   Int?
-  startDate   DateTime
-  endDate     DateTime
+  id          Int       @id @default(autoincrement())
+  status      String
+  products    Product[]
 }
 
 model Review {
-  id        Int       @id @default(autoincrement())
-  rating    Int       @default(0)
-  comment   String?
-  product   Product?
-  productId Int?
-  business   Business?
-  businessId Int?
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 model Order {
-  id          Int         @id @default(autoincrement())
-  total       Float
-  orderItems  OrderItem[]
+  id        Int      @id @default(autoincrement())
+  total     Float
+  items     OrderItem[]
 }
 
 model OrderItem {
-  id          Int       @id @default(autoincrement())
-  quantity     Int     @default(1)
-  product      Product
-  productId    Int
-  order        Order?
-  orderId      Int?
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  productId Int
+  orderId   Int
+  product   Product @relation(fields: [productId], references: [id])
+  order     Order @relation(fields: [orderId], references: [id])
 }
